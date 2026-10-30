@@ -16,5 +16,5 @@ for i in range(0, len(y)):
     if(yHat[i] != y[i]):
         print("Data Point #", i, "\tPredict: ", yHat[i], "\tReal", y[i])
 
-
+print(iris.feature_names)
 print(lda.score(X, y))
