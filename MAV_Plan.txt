@@ -5,3 +5,15 @@ Example Signal: 2   0   1   5   5   5   5   5   1   2   0   1
                                [    Window   ]
                                        [    Window   ]
                                                [    Window   ]
+
+size = 12
+window size = 4
+stride = 2
+
+signal[0:3]
+signal[2:5]
+signal[4:7]
+....
+
+for i in range(0, size-WindowSize, 2):
+    return mean( absolutValu( signal[i:(size+i-1)] ) )
