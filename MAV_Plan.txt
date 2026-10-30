@@ -15,5 +15,5 @@ signal[2:5]
 signal[4:7]
 ....
 
-for i in range(0, size-WindowSize, 2):
+for i in range(0, size-WindowSize + 1, 2):
     return mean( absolutValu( signal[i:(size+i-1)] ) )
