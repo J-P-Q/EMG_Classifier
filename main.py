@@ -3,24 +3,31 @@ from collections import deque
 
 N_CHANNELS = 8
 WINDOW_SIZE = 40 #assumption only 
+STRIDE = 20 #assumption only
+sampleCounter = 0
 
-ringBuffers = [deque(maxlen=WINDOW_SIZE*2) for _ in range(N_CHANNELS)]
+ringBuffers = [deque(maxlen=WINDOW_SIZE) for _ in range(N_CHANNELS)]
 
-features = []
+features = deque(maxlen=5)
 
 def onEmg(emg, movement):
     print("{:5} | {:5} | {:5} | {:5} | {:5} | {:5} | {:5} | {:5} ".format(emg[0], emg[1], emg[2], emg[3], emg[4], emg[5], emg[6], emg[7]))
 
-    for channel in N_CHANNELS:
+    for channel in range(N_CHANNELS):
         ringBuffers[channel].append(emg[channel])
+
+    global sampleCounter
+    sampleCounter += 1
     return
 
 def windowAndMav():
-    if len(ringBuffers[0]) >= WINDOW_SIZE:
-        for i in range(N_CHANNELS):
-            window = [ringBuffers[i].popleft() for _ in range(WINDOW_SIZE)]
-            channelMav = sum(abs(x) for x in window) / WINDOW_SIZE
-            features.append(channelMav)
+    global sampleCounter
+    global features
+    if (len(ringBuffers[0]) == WINDOW_SIZE) and (sampleCounter >= STRIDE):
+        sampleCounter = 0
+
+        channelMav = [ sum(abs(x) for x in ringBuffers[i]) / WINDOW_SIZE for i in range(N_CHANNELS)]
+        features.append(channelMav)
     return 
 
 def dataGathering():
@@ -28,7 +35,8 @@ def dataGathering():
     return
 
 def predict():
-    # lda.predict(mavArray)
+    #ldaInput = features.popleft()
+    # lda.predict(ldaInput)
     return
 
 def main():
