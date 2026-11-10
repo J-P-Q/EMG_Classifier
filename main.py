@@ -10,16 +10,6 @@ ringBuffers = [deque(maxlen=WINDOW_SIZE) for _ in range(N_CHANNELS)]
 
 features = deque(maxlen=5)
 
-def onEmg(emg, movement):
-    print("{:5} | {:5} | {:5} | {:5} | {:5} | {:5} | {:5} | {:5} ".format(emg[0], emg[1], emg[2], emg[3], emg[4], emg[5], emg[6], emg[7]))
-
-    for channel in range(N_CHANNELS):
-        ringBuffers[channel].append(emg[channel])
-
-    global sampleCounter
-    sampleCounter += 1
-    return
-
 def windowAndMav():
     global sampleCounter
     global features
@@ -31,7 +21,24 @@ def windowAndMav():
     return 
 
 def dataGathering():
-    # save to CSV for training models
+    featureInput = features.popleft()
+    with open("testEmg.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(featureInput)
+    return
+
+
+def onEmg(emg, movement):
+    print("{:5} | {:5} | {:5} | {:5} | {:5} | {:5} | {:5} | {:5} ".format(emg[0], emg[1], emg[2], emg[3], emg[4], emg[5], emg[6], emg[7]))
+
+    for channel in range(N_CHANNELS):
+        ringBuffers[channel].append(emg[channel])
+
+    global sampleCounter
+    sampleCounter += 1
+
+    windowAndMav()
+    dataGathering()
     return
 
 def predict():
