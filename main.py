@@ -2,6 +2,7 @@ import pyomyo
 import csv
 import time
 from collections import deque
+import math
 
 N_CHANNELS = 8
 WINDOW_SIZE = 40 #assumption only 
@@ -35,7 +36,7 @@ def onEmg(emg, movement):
     if not recording:   # Gate Recording
         return
 
-    print("{:5} | {:5} | {:5} | {:5} | {:5} | {:5} | {:5} | {:5} ".format(emg[0], emg[1], emg[2], emg[3], emg[4], emg[5], emg[6], emg[7]))
+    #print("{:5} | {:5} | {:5} | {:5} | {:5} | {:5} | {:5} | {:5} ".format(emg[0], emg[1], emg[2], emg[3], emg[4], emg[5], emg[6], emg[7]))
 
     for channel in range(N_CHANNELS):
         ringBuffers[channel].append(emg[channel])
@@ -59,14 +60,17 @@ def main():
     global recording
     global rawWriter
     global featureWriter
-    lastPrintedCountdown = None
+    lastCount = None
+    printedPromptAlready = False
 
-    rawFile = open("rawEmgTest1.csv", "w", newline="")
+    rawFile = open("rawEmgOpenTest10.csv", "w", newline="")
     rawWriter = csv.writer(rawFile)
 
-    featureFile = open("featureEmgTest1.csv", "w", newline="")
+    featureFile = open("featureEmgOpenTest10.csv", "w", newline="")
     featureWriter = csv.writer(featureFile)
 
+    print("Wait For Prompt")
+    armband.run()
     start = time.time()
     try:
         while True:
@@ -74,13 +78,17 @@ def main():
 
             if elapsed < 5:
                 recording = False
-                countDown = math.ceil(5 - ekapsed)
-                if countDown != lastPrintedCountdown:
-                    print(countDown)
-                    lastPrintedCountdown = countDown
-                print("hold gesture now")
+                countDown = math.ceil(5 - elapsed)
+                if countDown <= 3 and countDown != lastCount:
+                    print(countDown, round(elapsed, 2))
+                    lastCount = countDown
             elif elapsed < 10:
                 recording = True
+                if not printedPromptAlready:
+                    print("HOLD GESTURE NOW", round(elapsed, 2))
+                    printedPromptAlready = True
+
+
             else: 
                 break
 
