@@ -59,6 +59,7 @@ def main():
     global recording
     global rawWriter
     global featureWriter
+    lastPrintedCountdown = None
 
     rawFile = open("rawEmgTest1.csv", "w", newline="")
     rawWriter = csv.writer(rawFile)
@@ -73,6 +74,11 @@ def main():
 
             if elapsed < 5:
                 recording = False
+                countDown = math.ceil(5 - ekapsed)
+                if countDown != lastPrintedCountdown:
+                    print(countDown)
+                    lastPrintedCountdown = countDown
+                print("hold gesture now")
             elif elapsed < 10:
                 recording = True
             else: 
