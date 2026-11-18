@@ -1,3 +1,4 @@
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import csv
 import numpy as np
 
@@ -25,28 +26,33 @@ def loadCsvToArray(path):
     return array
 
 # MAIN
-pathOpenFormat = "featureEmgOpenTest"
-pathRestFormat = "featureEmgRestTest"
-pathCloseFormat = "featureEmgTest"
-
-arrayOfOpenData = []
-arrayOfRestData = []
-arrayOfCloseData = []
-
-for i in range(10):
-    tempMatrix = loadCsvToArray(pathOpenFormat + str(i+1) + ".csv")
-    arrayOfOpenData.append(tempMatrix)
-
-for i in range(10):
-    tempMatrix = loadCsvToArray(pathRestFormat + str(i+1) + ".csv")
-    arrayOfRestData.append(tempMatrix)
-
-for i in range(10):
-    tempMatrix = loadCsvToArray(pathCloseFormat + str(i+1) + ".csv")
-    arrayOfCloseData.append(tempMatrix)
+classes = ["Open", "Rest", ""]
 
 
-print(arrayOfOpenData[0])
+for heldOutBatch in range(1, 11):
+    trainRows = []
+    trainLabels = []
+    testRows = []
+    testLabels = []
+    for className in classes:
+        for holdNumber in range(1, 11):
+            path = "featureEmg" + className + "Test" + str(holdNumber) + ".csv"
+            #print("Path: ", path)
+            fileArray = loadCsvToArray(path)
 
-print("\n\n")
-print(arrayOfCloseData[3])
+            for row in fileArray:
+                if holdNumber == heldOutBatch:
+                    testRows.append(row)
+                    testLabels.append(className)
+                else:
+                    trainRows.append(row)
+                    trainLabels.append(className)
+
+    Xtrain = np.array(trainRows)
+    Xtest = np.array(testRows)
+
+    lda = LinearDiscriminantAnalysis()
+    lda.fit(Xtrain, trainLabels)
+
+    print("Accuracy", heldOutBatch, ":  ", lda.score(Xtest, testLabels))
+
