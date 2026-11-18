@@ -46,4 +46,7 @@ for i in range(10):
     arrayOfCloseData.append(tempMatrix)
 
 
-print(arrayOfOpenData)
+print(arrayOfOpenData[0])
+
+print("\n\n")
+print(arrayOfCloseData[3])
